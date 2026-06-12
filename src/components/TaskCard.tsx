@@ -1,0 +1,123 @@
+"use client";
+
+import { useState } from "react";
+import type { TaskCard as TaskCardType } from "@/lib/types";
+
+type TaskCardProps = {
+  card: TaskCardType;
+  onDelete: (cardId: string) => void;
+  onUpdate: (
+    cardId: string,
+    updates: Partial<Pick<TaskCardType, "title" | "description">>,
+  ) => void;
+};
+
+export function TaskCard({ card, onDelete, onUpdate }: TaskCardProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [title, setTitle] = useState(card.title);
+  const [description, setDescription] = useState(card.description ?? "");
+
+  function handleDragStart(event: React.DragEvent<HTMLDivElement>) {
+    event.dataTransfer.setData("text/card-id", card.id);
+    event.dataTransfer.effectAllowed = "move";
+  }
+
+  function saveEdits() {
+    onUpdate(card.id, { title, description });
+    setIsEditing(false);
+  }
+
+  return (
+    <article
+      draggable={!isEditing}
+      onDragStart={handleDragStart}
+      className="group rounded-xl border border-white/10 bg-white/90 p-3 shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-zinc-900/90"
+    >
+      {isEditing ? (
+        <div className="space-y-2">
+          <input
+            value={title}
+            onChange={(event) => setTitle(event.target.value)}
+            className="w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-900 outline-none ring-sky-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+            autoFocus
+          />
+          <textarea
+            value={description}
+            onChange={(event) => setDescription(event.target.value)}
+            rows={3}
+            placeholder="Notes..."
+            className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm text-zinc-900 outline-none ring-sky-500 focus:ring-2 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-50"
+          />
+          <div className="flex gap-2">
+            <button
+              type="button"
+              onClick={saveEdits}
+              className="rounded-lg bg-sky-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-sky-500"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setTitle(card.title);
+                setDescription(card.description ?? "");
+                setIsEditing(false);
+              }}
+              className="rounded-lg px-2.5 py-1 text-xs font-medium text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex items-start justify-between gap-2">
+            <h3 className="text-sm font-semibold leading-snug text-zinc-900 dark:text-zinc-50">
+              {card.title}
+            </h3>
+            <div className="flex gap-1 opacity-0 transition group-hover:opacity-100">
+              <button
+                type="button"
+                aria-label="Edit card"
+                onClick={() => setIsEditing(true)}
+                className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                aria-label="Delete card"
+                onClick={() => onDelete(card.id)}
+                className="rounded-md px-1.5 py-0.5 text-xs text-rose-500 hover:bg-rose-500/10"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          {card.description ? (
+            <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
+              {card.description}
+            </p>
+          ) : null}
+        </>
+      )}
+    </article>
+  );
+}
+
+export function useCardDrop(onMove: (cardId: string, columnId: string) => void) {
+  function handleDragOver(event: React.DragEvent<HTMLElement>) {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLElement>, columnId: string) {
+    event.preventDefault();
+    const cardId = event.dataTransfer.getData("text/card-id");
+    if (cardId) {
+      onMove(cardId, columnId);
+    }
+  }
+
+  return { handleDragOver, handleDrop };
+}
