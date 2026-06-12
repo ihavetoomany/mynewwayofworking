@@ -127,7 +127,7 @@ export function VacationBoard() {
   if (!board) {
     return (
       <div className="flex flex-1 items-center justify-center">
-        <p className="text-sm text-zinc-500">Loading your vacation plan...</p>
+        <p className="text-sm text-white/80">Loading your vacation plan...</p>
       </div>
     );
   }
@@ -137,31 +137,31 @@ export function VacationBoard() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <header className="border-b border-white/10 bg-white/60 px-6 py-5 backdrop-blur-xl dark:bg-zinc-950/60">
+      <header className="border-b border-white/20 px-6 py-5">
         <div className="mx-auto flex max-w-[1600px] flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-600 dark:text-sky-400">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
               Vacation countdown board
             </p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50">
+            <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
               Plan every day until July 11
             </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/85">
               Drag cards between days, capture priorities, and keep momentum from{" "}
               {START_DATE} through vacation on {VACATION_DATE}.
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm dark:bg-zinc-900/70">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Days mapped</p>
+            <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-wide text-white/70">Days mapped</p>
               <p className="mt-1 text-lg font-semibold">{daysUntilVacation}</p>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm dark:bg-zinc-900/70">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Cards planned</p>
+            <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-wide text-white/70">Cards planned</p>
               <p className="mt-1 text-lg font-semibold">{totalCards}</p>
             </div>
-            <div className="rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-sm dark:bg-zinc-900/70">
-              <p className="text-xs uppercase tracking-wide text-zinc-500">Storage</p>
+            <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
+              <p className="text-xs uppercase tracking-wide text-white/70">Storage</p>
               <p className="mt-1 text-sm font-medium capitalize">
                 {storageMode.replace("-", " ")}
               </p>
@@ -176,7 +176,7 @@ export function VacationBoard() {
               </p>
             ) : null}
             {isSaving ? (
-              <p className="mt-2 text-xs text-zinc-500">Saving changes...</p>
+              <p className="mt-2 text-xs text-white/70">Saving changes...</p>
             ) : null}
           </div>
         )}
