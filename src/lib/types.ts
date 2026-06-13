@@ -13,6 +13,7 @@ export type DayColumn = {
   label: string;
   subtitle: string;
   isVacation: boolean;
+  isToday: boolean;
 };
 
 export type Board = {

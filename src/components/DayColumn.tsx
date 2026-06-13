@@ -47,8 +47,12 @@ export function DayColumnView({
     <section
       className={`flex w-72 shrink-0 flex-col rounded-2xl border p-3 backdrop-blur-md ${
         column.isVacation
-          ? "border-amber-300/40 bg-amber-50/70 dark:border-amber-400/30 dark:bg-amber-500/10"
-          : "border-white/10 bg-white/40 dark:bg-zinc-900/40"
+          ? column.isToday
+            ? "border-amber-300/55 bg-amber-50/85 dark:border-amber-400/40 dark:bg-amber-500/20"
+            : "border-amber-300/40 bg-amber-50/70 dark:border-amber-400/30 dark:bg-amber-500/10"
+          : column.isToday
+            ? "border-white/25 bg-white/60 dark:bg-zinc-900/60"
+            : "border-white/10 bg-white/40 dark:bg-zinc-900/40"
       }`}
     >
       <header className="mb-3 px-1">

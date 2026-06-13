@@ -53,6 +53,11 @@ export function buildDayColumns(): DayColumn[] {
     const date = new Date(cursor);
     const id = formatDateId(date);
     const isVacation = id === VACATION_DATE;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const columnDate = new Date(date);
+    columnDate.setHours(0, 0, 0, 0);
+    const isToday = columnDate.getTime() === today.getTime();
 
     columns.push({
       id,
@@ -60,6 +65,7 @@ export function buildDayColumns(): DayColumn[] {
       label: formatLabel(date),
       subtitle: formatSubtitle(date, isVacation),
       isVacation,
+      isToday,
     });
   }
 
