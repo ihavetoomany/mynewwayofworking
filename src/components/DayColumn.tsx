@@ -2,13 +2,13 @@
 
 import { useState } from "react";
 import type { DayColumn, TaskCard as TaskCardType } from "@/lib/types";
-import { TaskCard, useCardDrop } from "./TaskCard";
+import { TaskCard, useColumnDrop } from "./TaskCard";
 
 type DayColumnProps = {
   column: DayColumn;
   cards: TaskCardType[];
   onAddCard: (columnId: string, title: string) => Promise<void>;
-  onMoveCard: (cardId: string, columnId: string) => Promise<void>;
+  onMoveCard: (cardId: string, columnId: string, index?: number) => Promise<void>;
   onDeleteCard: (cardId: string) => Promise<void>;
   onUpdateCard: (
     cardId: string,
@@ -28,8 +28,8 @@ export function DayColumnView({
 }: DayColumnProps) {
   const [draft, setDraft] = useState("");
   const [isAdding, setIsAdding] = useState(false);
-  const { handleDragOver, handleDrop } = useCardDrop((cardId, columnId) => {
-    void onMoveCard(cardId, columnId);
+  const { handleDragOver, handleDrop } = useColumnDrop((cardId, columnId, index) => {
+    void onMoveCard(cardId, columnId, index);
   });
 
   async function submitCard() {
@@ -50,8 +50,6 @@ export function DayColumnView({
           ? "border-amber-300/40 bg-amber-50/70 dark:border-amber-400/30 dark:bg-amber-500/10"
           : "border-white/10 bg-white/40 dark:bg-zinc-900/40"
       }`}
-      onDragOver={handleDragOver}
-      onDrop={(event) => handleDrop(event, column.id)}
     >
       <header className="mb-3 px-1">
         <div className="flex items-center justify-between gap-2">
@@ -67,14 +65,23 @@ export function DayColumnView({
         </p>
       </header>
 
-      <div className="flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto pb-2">
-        {cards.map((card) => (
+      <div
+        className="flex min-h-32 flex-1 flex-col gap-2 overflow-y-auto pb-2 pt-2"
+        onDragOver={handleDragOver}
+        onDrop={(event) => handleDrop(event, column.id, cards.length)}
+      >
+        {cards.map((card, index) => (
           <TaskCard
             key={card.id}
             card={card}
+            index={index}
+            columnId={column.id}
             onDelete={(cardId) => void onDeleteCard(cardId)}
             onUpdate={(cardId, updates) => void onUpdateCard(cardId, updates)}
             onToggleDone={(cardId, done) => void onToggleDone(cardId, done)}
+            onMoveCard={(cardId, columnId, insertIndex) =>
+              void onMoveCard(cardId, columnId, insertIndex)
+            }
           />
         ))}
       </div>

@@ -76,10 +76,82 @@ export async function addCard(input: {
   });
 }
 
+function getColumnCardIds(board: Board, columnId: string): string[] {
+  return board.cards.filter((card) => card.columnId === columnId).map((card) => card.id);
+}
+
+function applyBoardOrder(board: Board, orderByColumn: Map<string, string[]>): TaskCard[] {
+  const cardMap = new Map(board.cards.map((card) => [card.id, card]));
+
+  return board.columns.flatMap((column) => {
+    const ids = orderByColumn.get(column.id) ?? [];
+
+    return ids.map((id) => {
+      const card = cardMap.get(id);
+      if (!card) {
+        throw new Error("Card not found");
+      }
+
+      return { ...card, columnId: column.id };
+    });
+  });
+}
+
+export async function moveCard(
+  cardId: string,
+  columnId: string,
+  index?: number,
+): Promise<Board> {
+  const board = await getBoard();
+  const card = board.cards.find((entry) => entry.id === cardId);
+
+  if (!card) {
+    throw new Error("Card not found");
+  }
+
+  if (!board.columns.some((column) => column.id === columnId)) {
+    throw new Error("Invalid column");
+  }
+
+  const orderByColumn = new Map<string, string[]>();
+  for (const column of board.columns) {
+    orderByColumn.set(column.id, getColumnCardIds(board, column.id));
+  }
+
+  const sourceColumnId = card.columnId;
+  const sourceIds = orderByColumn.get(sourceColumnId) ?? [];
+  const sourceIndex = sourceIds.indexOf(cardId);
+
+  if (sourceIndex === -1) {
+    throw new Error("Card not found");
+  }
+
+  sourceIds.splice(sourceIndex, 1);
+  orderByColumn.set(sourceColumnId, sourceIds);
+
+  const targetIds = orderByColumn.get(columnId) ?? [];
+  let insertAt = index ?? targetIds.length;
+
+  if (sourceColumnId === columnId && sourceIndex < insertAt) {
+    insertAt -= 1;
+  }
+
+  insertAt = Math.max(0, Math.min(insertAt, targetIds.length));
+  targetIds.splice(insertAt, 0, cardId);
+  orderByColumn.set(columnId, targetIds);
+
+  const cards = applyBoardOrder(board, orderByColumn);
+  return saveBoard({ ...board, cards });
+}
+
 export async function updateCard(
   cardId: string,
   updates: Partial<Pick<TaskCard, "title" | "description" | "columnId" | "done">>,
 ): Promise<Board> {
+  if (updates.columnId) {
+    return moveCard(cardId, updates.columnId);
+  }
+
   const board = await getBoard();
   let found = false;
 
@@ -90,10 +162,6 @@ export async function updateCard(
 
     found = true;
 
-    if (updates.columnId && !board.columns.some((column) => column.id === updates.columnId)) {
-      throw new Error("Invalid column");
-    }
-
     return {
       ...card,
       title: updates.title?.trim() ?? card.title,
@@ -101,7 +169,6 @@ export async function updateCard(
         updates.description !== undefined
           ? updates.description.trim() || undefined
           : card.description,
-      columnId: updates.columnId ?? card.columnId,
       done: updates.done ?? card.done,
     };
   });

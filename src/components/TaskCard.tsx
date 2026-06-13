@@ -5,22 +5,58 @@ import type { TaskCard as TaskCardType } from "@/lib/types";
 
 type TaskCardProps = {
   card: TaskCardType;
+  index: number;
+  columnId: string;
   onDelete: (cardId: string) => void;
   onUpdate: (
     cardId: string,
     updates: Partial<Pick<TaskCardType, "title" | "description">>,
   ) => void;
   onToggleDone: (cardId: string, done: boolean) => void;
+  onMoveCard: (cardId: string, columnId: string, index?: number) => void;
 };
 
-export function TaskCard({ card, onDelete, onUpdate, onToggleDone }: TaskCardProps) {
+export function TaskCard({
+  card,
+  index,
+  columnId,
+  onDelete,
+  onUpdate,
+  onToggleDone,
+  onMoveCard,
+}: TaskCardProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const [isDragOver, setIsDragOver] = useState(false);
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description ?? "");
 
   function handleDragStart(event: React.DragEvent<HTMLDivElement>) {
     event.dataTransfer.setData("text/card-id", card.id);
     event.dataTransfer.effectAllowed = "move";
+  }
+
+  function handleDragOver(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    event.dataTransfer.dropEffect = "move";
+    setIsDragOver(true);
+  }
+
+  function handleDragLeave() {
+    setIsDragOver(false);
+  }
+
+  function handleDrop(event: React.DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    event.stopPropagation();
+    setIsDragOver(false);
+
+    const draggedCardId = event.dataTransfer.getData("text/card-id");
+    if (!draggedCardId || draggedCardId === card.id) {
+      return;
+    }
+
+    onMoveCard(draggedCardId, columnId, index);
   }
 
   function saveEdits() {
@@ -32,10 +68,17 @@ export function TaskCard({ card, onDelete, onUpdate, onToggleDone }: TaskCardPro
     <article
       draggable={!isEditing}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
       className={`group rounded-xl border p-3 shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+        isEditing ? "cursor-default" : "cursor-grab active:cursor-grabbing"
+      } ${
+        isDragOver ? "border-sky-400 ring-2 ring-sky-300/60" : ""
+      } ${
         card.done
-          ? "border-emerald-300/60 bg-emerald-50/90 dark:border-emerald-500/30 dark:bg-emerald-950/40"
-          : "border-white/10 bg-white/90 dark:border-white/10 dark:bg-zinc-900/90"
+          ? "border-emerald-300/60 bg-emerald-50/55 dark:border-emerald-500/30 dark:bg-emerald-950/35"
+          : "border-white/20 bg-white/60 dark:border-white/15 dark:bg-zinc-900/55"
       }`}
     >
       {isEditing ? (
@@ -140,17 +183,17 @@ export function TaskCard({ card, onDelete, onUpdate, onToggleDone }: TaskCardPro
   );
 }
 
-export function useCardDrop(onMove: (cardId: string, columnId: string) => void) {
+export function useColumnDrop(onMoveCard: (cardId: string, columnId: string, index?: number) => void) {
   function handleDragOver(event: React.DragEvent<HTMLElement>) {
     event.preventDefault();
     event.dataTransfer.dropEffect = "move";
   }
 
-  function handleDrop(event: React.DragEvent<HTMLElement>, columnId: string) {
+  function handleDrop(event: React.DragEvent<HTMLElement>, columnId: string, index: number) {
     event.preventDefault();
     const cardId = event.dataTransfer.getData("text/card-id");
     if (cardId) {
-      onMove(cardId, columnId);
+      onMoveCard(cardId, columnId, index);
     }
   }
 

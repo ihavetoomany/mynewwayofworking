@@ -90,12 +90,12 @@ export function VacationBoard() {
     });
   }
 
-  async function handleMoveCard(cardId: string, columnId: string) {
+  async function handleMoveCard(cardId: string, columnId: string, index?: number) {
     await withSaving(async () => {
       const response = await fetch(`/api/cards/${cardId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ columnId }),
+        body: JSON.stringify({ columnId, index }),
       });
       await refreshFromResponse(response);
     });
@@ -159,7 +159,7 @@ export function VacationBoard() {
               Plan every day until July 11
             </h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-white/85">
-              Drag cards between days, capture priorities, and keep momentum from{" "}
+              Drag cards within or between days to reorder and plan from{" "}
               {START_DATE} through vacation on {VACATION_DATE}.
             </p>
           </div>
