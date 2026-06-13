@@ -182,18 +182,20 @@ export function VacationBoard() {
             </div>
           </div>
         </div>
-        {(error || isSaving) && (
-          <div className="mx-auto mt-4 max-w-[1600px]">
-            {error ? (
-              <p className="rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-600 dark:text-rose-300">
-                {error}
-              </p>
-            ) : null}
-            {isSaving ? (
-              <p className="mt-2 text-xs text-white/70">Saving changes...</p>
-            ) : null}
-          </div>
-        )}
+        <div className="mx-auto mt-4 min-h-6 max-w-[1600px]">
+          {error ? (
+            <p className="rounded-xl bg-rose-500/10 px-3 py-2 text-sm text-rose-200">
+              {error}
+            </p>
+          ) : (
+            <p
+              aria-live="polite"
+              className={`text-xs text-white/70 ${isSaving ? "opacity-100" : "opacity-0"}`}
+            >
+              Saving changes...
+            </p>
+          )}
+        </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-x-auto overflow-y-hidden px-6 py-6">
