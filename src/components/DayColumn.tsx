@@ -14,6 +14,7 @@ type DayColumnProps = {
     cardId: string,
     updates: Partial<Pick<TaskCardType, "title" | "description">>,
   ) => Promise<void>;
+  onToggleDone: (cardId: string, done: boolean) => Promise<void>;
 };
 
 export function DayColumnView({
@@ -23,6 +24,7 @@ export function DayColumnView({
   onMoveCard,
   onDeleteCard,
   onUpdateCard,
+  onToggleDone,
 }: DayColumnProps) {
   const [draft, setDraft] = useState("");
   const [isAdding, setIsAdding] = useState(false);
@@ -72,6 +74,7 @@ export function DayColumnView({
             card={card}
             onDelete={(cardId) => void onDeleteCard(cardId)}
             onUpdate={(cardId, updates) => void onUpdateCard(cardId, updates)}
+            onToggleDone={(cardId, done) => void onToggleDone(cardId, done)}
           />
         ))}
       </div>

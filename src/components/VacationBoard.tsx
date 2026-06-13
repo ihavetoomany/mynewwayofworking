@@ -124,6 +124,17 @@ export function VacationBoard() {
     });
   }
 
+  async function handleToggleDone(cardId: string, done: boolean) {
+    await withSaving(async () => {
+      const response = await fetch(`/api/cards/${cardId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done }),
+      });
+      await refreshFromResponse(response);
+    });
+  }
+
   if (!board) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -133,6 +144,7 @@ export function VacationBoard() {
   }
 
   const totalCards = board.cards.length;
+  const doneCards = board.cards.filter((card) => card.done).length;
   const daysUntilVacation = board.columns.length;
 
   return (
@@ -157,8 +169,10 @@ export function VacationBoard() {
               <p className="mt-1 text-lg font-semibold">{daysUntilVacation}</p>
             </div>
             <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-wide text-white/70">Cards planned</p>
-              <p className="mt-1 text-lg font-semibold">{totalCards}</p>
+              <p className="text-xs uppercase tracking-wide text-white/70">Tasks done</p>
+              <p className="mt-1 text-lg font-semibold">
+                {doneCards} / {totalCards}
+              </p>
             </div>
             <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
               <p className="text-xs uppercase tracking-wide text-white/70">Storage</p>
@@ -193,6 +207,7 @@ export function VacationBoard() {
               onMoveCard={handleMoveCard}
               onDeleteCard={handleDeleteCard}
               onUpdateCard={handleUpdateCard}
+              onToggleDone={handleToggleDone}
             />
           ))}
         </div>

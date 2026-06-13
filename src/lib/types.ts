@@ -3,6 +3,7 @@ export type TaskCard = {
   title: string;
   description?: string;
   columnId: string;
+  done: boolean;
   createdAt: string;
 };
 

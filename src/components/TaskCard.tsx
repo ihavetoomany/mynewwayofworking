@@ -10,9 +10,10 @@ type TaskCardProps = {
     cardId: string,
     updates: Partial<Pick<TaskCardType, "title" | "description">>,
   ) => void;
+  onToggleDone: (cardId: string, done: boolean) => void;
 };
 
-export function TaskCard({ card, onDelete, onUpdate }: TaskCardProps) {
+export function TaskCard({ card, onDelete, onUpdate, onToggleDone }: TaskCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState(card.title);
   const [description, setDescription] = useState(card.description ?? "");
@@ -31,7 +32,11 @@ export function TaskCard({ card, onDelete, onUpdate }: TaskCardProps) {
     <article
       draggable={!isEditing}
       onDragStart={handleDragStart}
-      className="group rounded-xl border border-white/10 bg-white/90 p-3 shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-white/10 dark:bg-zinc-900/90"
+      className={`group rounded-xl border p-3 shadow-sm backdrop-blur-sm transition hover:-translate-y-0.5 hover:shadow-md ${
+        card.done
+          ? "border-emerald-300/60 bg-emerald-50/90 dark:border-emerald-500/30 dark:bg-emerald-950/40"
+          : "border-white/10 bg-white/90 dark:border-white/10 dark:bg-zinc-900/90"
+      }`}
     >
       {isEditing ? (
         <div className="space-y-2">
@@ -71,34 +76,64 @@ export function TaskCard({ card, onDelete, onUpdate }: TaskCardProps) {
         </div>
       ) : (
         <>
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="text-sm font-semibold leading-snug text-zinc-900 dark:text-zinc-50">
-              {card.title}
-            </h3>
-            <div className="flex gap-1 opacity-0 transition group-hover:opacity-100">
-              <button
-                type="button"
-                aria-label="Edit card"
-                onClick={() => setIsEditing(true)}
-                className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                aria-label="Delete card"
-                onClick={() => onDelete(card.id)}
-                className="rounded-md px-1.5 py-0.5 text-xs text-rose-500 hover:bg-rose-500/10"
-              >
-                Delete
-              </button>
+          <div className="flex items-start gap-2">
+            <label className="mt-0.5 flex shrink-0 cursor-pointer items-center">
+              <input
+                type="checkbox"
+                checked={card.done}
+                onChange={(event) => onToggleDone(card.id, event.target.checked)}
+                aria-label={card.done ? "Mark task as not done" : "Mark task as done"}
+                className="size-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
+              />
+            </label>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start justify-between gap-2">
+                <h3
+                  className={`text-sm font-semibold leading-snug ${
+                    card.done
+                      ? "text-zinc-500 line-through dark:text-zinc-400"
+                      : "text-zinc-900 dark:text-zinc-50"
+                  }`}
+                >
+                  {card.title}
+                </h3>
+                <div className="flex gap-1 opacity-0 transition group-hover:opacity-100">
+                  <button
+                    type="button"
+                    aria-label="Edit card"
+                    onClick={() => setIsEditing(true)}
+                    className="rounded-md px-1.5 py-0.5 text-xs text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    aria-label="Delete card"
+                    onClick={() => onDelete(card.id)}
+                    className="rounded-md px-1.5 py-0.5 text-xs text-rose-500 hover:bg-rose-500/10"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+              {card.description ? (
+                <p
+                  className={`mt-2 text-xs leading-relaxed ${
+                    card.done
+                      ? "text-zinc-400 line-through dark:text-zinc-500"
+                      : "text-zinc-600 dark:text-zinc-300"
+                  }`}
+                >
+                  {card.description}
+                </p>
+              ) : null}
+              {card.done ? (
+                <p className="mt-2 text-xs font-medium text-emerald-700 dark:text-emerald-400">
+                  Task done
+                </p>
+              ) : null}
             </div>
           </div>
-          {card.description ? (
-            <p className="mt-2 text-xs leading-relaxed text-zinc-600 dark:text-zinc-300">
-              {card.description}
-            </p>
-          ) : null}
         </>
       )}
     </article>

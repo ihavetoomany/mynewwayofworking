@@ -12,6 +12,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       title?: string;
       description?: string;
       columnId?: string;
+      done?: boolean;
     };
 
     const board = await updateCard(id, body);

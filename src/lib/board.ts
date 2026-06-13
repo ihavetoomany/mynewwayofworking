@@ -24,7 +24,7 @@ function mergeBoard(stored: Board | null): Board {
     }
 
     const existing = cardsByColumn.get(card.columnId) ?? [];
-    existing.push(card);
+    existing.push({ ...card, done: card.done ?? false });
     cardsByColumn.set(card.columnId, existing);
   }
 
@@ -66,6 +66,7 @@ export async function addCard(input: {
     title: input.title.trim(),
     description: input.description?.trim() || undefined,
     columnId: input.columnId,
+    done: false,
     createdAt: new Date().toISOString(),
   };
 
@@ -77,7 +78,7 @@ export async function addCard(input: {
 
 export async function updateCard(
   cardId: string,
-  updates: Partial<Pick<TaskCard, "title" | "description" | "columnId">>,
+  updates: Partial<Pick<TaskCard, "title" | "description" | "columnId" | "done">>,
 ): Promise<Board> {
   const board = await getBoard();
   let found = false;
@@ -101,6 +102,7 @@ export async function updateCard(
           ? updates.description.trim() || undefined
           : card.description,
       columnId: updates.columnId ?? card.columnId,
+      done: updates.done ?? card.done,
     };
   });
 
