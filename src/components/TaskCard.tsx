@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { celebrateTaskDone } from "@/lib/confetti";
 import type { TaskCard as TaskCardType } from "@/lib/types";
 
 type TaskCardProps = {
@@ -64,6 +65,14 @@ export function TaskCard({
     setIsEditing(false);
   }
 
+  function handleToggleDone(event: React.ChangeEvent<HTMLInputElement>) {
+    const done = event.target.checked;
+    if (done) {
+      celebrateTaskDone();
+    }
+    onToggleDone(card.id, done);
+  }
+
   return (
     <article
       draggable={!isEditing}
@@ -124,7 +133,7 @@ export function TaskCard({
               <input
                 type="checkbox"
                 checked={card.done}
-                onChange={(event) => onToggleDone(card.id, event.target.checked)}
+                onChange={handleToggleDone}
                 aria-label={card.done ? "Mark task as not done" : "Mark task as done"}
                 className="size-4 rounded border-zinc-300 text-emerald-600 focus:ring-emerald-500"
               />
