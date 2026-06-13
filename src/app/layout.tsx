@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Vacation Countdown Board",
   description:
-    "Plan your days from now until vacation on July 11 with a Trello-style board backed by Redis.",
+    "Plan your days from now until vacation on July 11 with a Trello-style board backed by Neon Postgres.",
 };
 
 export default function RootLayout({

@@ -71,3 +71,11 @@ export function buildDayColumns(): DayColumn[] {
 
   return columns;
 }
+
+export function getDaysLeftFromToday(columns: DayColumn[]): number {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const todayId = formatDateId(today);
+
+  return columns.filter((column) => column.date >= todayId).length;
+}

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import type { Board, TaskCard } from "@/lib/types";
+import { getDaysLeftFromToday } from "@/lib/dates";
 import { START_DATE, VACATION_DATE } from "@/lib/types";
 import { DayColumnView } from "./DayColumn";
 
@@ -145,7 +146,7 @@ export function VacationBoard() {
 
   const totalCards = board.cards.length;
   const doneCards = board.cards.filter((card) => card.done).length;
-  const daysUntilVacation = board.columns.length;
+  const daysLeft = getDaysLeftFromToday(board.columns);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
@@ -165,8 +166,8 @@ export function VacationBoard() {
           </div>
           <div className="flex flex-wrap gap-3">
             <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
-              <p className="text-xs uppercase tracking-wide text-white/70">Days mapped</p>
-              <p className="mt-1 text-lg font-semibold">{daysUntilVacation}</p>
+              <p className="text-xs uppercase tracking-wide text-white/70">Days left</p>
+              <p className="mt-1 text-lg font-semibold">{daysLeft}</p>
             </div>
             <div className="rounded-2xl border border-white/25 bg-white/15 px-4 py-3 text-sm text-white backdrop-blur-sm">
               <p className="text-xs uppercase tracking-wide text-white/70">Tasks done</p>
